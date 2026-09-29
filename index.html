@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RNGP</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    margin:0;
+    background:
+        radial-gradient(circle at 50% 35%,rgba(255,190,0,.12),transparent 30%),
+        linear-gradient(145deg,#030504,#10120d,#030403);
+    color:#fff;
+    font-family:Arial,sans-serif;
+    min-height:100vh;
+    padding-bottom:90px;
+}
+
+.app{
+    width:100%;
+    max-width:520px;
+    margin:auto;
+}
+
+/* TOP */
+
+.top{
+    padding:22px 18px 10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+}
+
+.name{
+    font-size:24px;
+    font-weight:800;
+}
+
+.info{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:8px;
+}
+
+.level{
+    background:#fff;
+    color:#111;
+    padding:8px 14px;
+    border-radius:20px;
+    font-weight:bold;
+}
+
+.ready{
+    background:#102019;
+    color:#00ff9d;
+    padding:8px 13px;
+    border-radius:20px;
+    font-weight:bold;
+}
+
+.dot{
+    display:inline-block;
+    width:8px;
+    height:8px;
+    background:#00ff9d;
+    border-radius:50%;
+    margin-right:5px;
+}
+
+.wallet{
+    border:0;
+    border-radius:25px;
+    background:#0ca9ed;
+    color:white;
+    padding:11px 17px;
+    font-weight:bold;
+}
+
+/* ASSETS */
+
+.assets{
+    text-align:center;
+    padding:16px;
+}
+
+.asset-title{
+    color:#999;
+    letter-spacing:5px;
+    font-size:13px;
+}
+
+.balance{
+    font-size:31px;
+    font-weight:bold;
+    margin-top:8px;
+}
+
+.balance span{
+    color:#ffd500;
+}
+
+.wallet-info{
+    display:inline-block;
+    background:#11150e;
+    border:1px solid #5b511b;
+    border-radius:25px;
+    padding:10px 18px;
+    margin-top:10px;
+    font-size:14px;
+}
+
+.wallet-info b{
+    color:#ffd500;
+}
+
+.gain{
+    margin:14px auto;
+    padding:8px;
+    max-width:410px;
+    border-radius:30px;
+    border:1px solid #294329;
+    background:#0d160e;
+    color:#00ffae;
+    font-size:48px;
+    font-weight:900;
+}
+
+/* COIN */
+
+.coin-area{
+    text-align:center;
+    padding:12px 0 18px;
+}
+
+.coin{
+    width:275px;
+    height:275px;
+    margin:auto;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+    radial-gradient(circle at 35% 25%,#fff0a0 0 4%,transparent 5%),
+    radial-gradient(circle,#e7bd36 0 56%,#815512 57% 62%,#f1ce57 63% 68%,#593906 69% 74%,#c89220 75%);
+
+    box-shadow:
+        0 0 35px rgba(255,190,0,.28),
+        inset 0 0 0 10px rgba(255,255,255,.1);
+}
+
+.coin-inner{
+    width:205px;
+    height:205px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:radial-gradient(circle,#dcae30,#986514);
+    border:5px solid #543605;
+}
+
+.coin-text{
+    font-size:55px;
+    font-weight:1000;
+    color:#201b0c;
+    letter-spacing:-3px;
+}
+
+/* CLAIM */
+
+.claim{
+    display:block;
+    width:calc(100% - 36px);
+    margin:auto;
+    padding:18px;
+    border:0;
+    border-radius:28px;
+    background:linear-gradient(100deg,#ffd800,#ff9d00);
+    color:#111;
+    font-size:20px;
+    font-weight:900;
+}
+
+/* PAGES */
+
+.page{
+    display:none;
+    padding:18px;
+}
+
+.page.active{
+    display:block;
+}
+
+.card{
+    background:#10130f;
+    border:1px solid #343a2e;
+    border-radius:20px;
+    padding:18px;
+    margin-bottom:14px;
+}
+
+.card h2{
+    margin-top:0;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    padding:13px 0;
+    border-bottom:1px solid #292d27;
+}
+
+.row:last-child{
+    border-bottom:0;
+}
+
+.action{
+    width:100%;
+    padding:14px;
+    border:0;
+    border-radius:14px;
+    background:#ffc800;
+    color:#111;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+/* TASK */
+
+.task{
+    background:#161a14;
+    padding:14px;
+    border-radius:15px;
+    margin:10px 0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.task button{
+    border:0;
+    border-radius:12px;
+    padding:9px 13px;
+    background:#ffc800;
+    font-weight:bold;
+}
+
+/* BOTTOM NAV */
+
+.bottom{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    height:78px;
+    background:#030403;
+    border-top:1px solid #292d27;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    z-index:99;
+}
+
+.bottom button{
+    background:none;
+    border:0;
+    color:#888;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.bottom button.active{
+    color:#ffd000;
+}
+
+.icon{
+    display:block;
+    font-size:24px;
+    margin-bottom:4px;
+}
+
+.small{
+    color:#999;
+    font-size:13px;
+    line-height:1.5;
+}
+
+input{
+    width:100%;
+    background:#080a08;
+    border:1px solid #41483a;
+    border-radius:12px;
+    padding:12px;
+    color:white;
+    margin:6px 0 12px;
+}
+
+.save{
+    background:#ffc800;
+    color:#111;
+    border:0;
+    padding:13px 18px;
+    border-radius:13px;
+    font-weight:bold;
+}
+
+@media(max-width:390px){
+
+    .coin{
+        width:245px;
+        height:245px;
+    }
+
+    .coin-inner{
+        width:180px;
+        height:180px;
+    }
+
+    .coin-text{
+        font-size:48px;
+    }
+
+    .gain{
+        font-size:40px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- HOME -->
+
+<div id="home" class="page active">
+
+<div class="top">
+
+<div>
+<div class="name" id="username">NIROB</div>
+
+<div class="info">
+<div class="level" id="level">Lvl 1</div>
+
+<div class="ready">
+<span class="dot"></span>
+<span id="status">READY</span>
+</div>
+</div>
+</div>
+
+<button class="wallet" onclick="wallet()">
+△ Connect<br>
+<small>Wallet</small>
+</button>
+
+</div>
+
+<div class="assets">
+
+<div class="asset-title">
+ASSETS
+</div>
+
+<div class="balance">
+<span id="balance">0.0000</span> RNGP
+</div>
+
+<div class="wallet-info">
+HOLDING WALLET:
+<b id="holding">0.0000</b> RNGP
+</div>
+
+<br>
+
+<div class="wallet-info">
+POOL WALLET:
+<b id="pool">0.0000</b> RNGP
+</div>
+
+<div class="gain">
++<span id="gain">0.0000</span>
+</div>
+
+</div>
+
+<div class="coin-area">
+
+<div class="coin">
+
+<div class="coin-inner">
+<div class="coin-text">
+RNGP
+</div>
+</div>
+
+</div>
+
+</div>
+
+<button class="claim" onclick="claim()">
+CLAIM
+</button>
+
+</div>
+
+
+<!-- TASKS -->
+
+<div id="tasks" class="page">
+
+<div class="card">
+
+<h2>📋 Tasks</h2>
+
+<p class="small">
+Complete tasks and receive demo RNGP points.
+</p>
+
+<div class="task">
+
+<span>
+Join Telegram
+<br>
+<small>Reward: 10 RNGP</small>
+</span>
+
+<button onclick="taskReward(this,10)">
+CLAIM
+</button>
+
+</div>
+
+<div class="task">
+
+<span>
+Open RNGP Mini App
+<br>
+<small>Reward: 5 RNGP</small>
+</span>
+
+<button onclick="taskReward(this,5)">
+CLAIM
+</button>
+
+</div>
+
+<div class="task">
+
+<span>
+Visit Profile
+<br>
+<small>Reward: 2 RNGP</small>
+</span>
+
+<button onclick="taskReward(this,2)">
+CLAIM
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- MINERS -->
+
+<div id="miners" class="page">
+
+<div class="card">
+
+<h2>⚡ Miners</h2>
+
+<div class="row">
+<span>Status</span>
+<b id="minerStatus">Ready</b>
+</div>
+
+<div class="row">
+<span>Mining Rate</span>
+<b id="rate">1 RNGP/min</b>
+</div>
+
+<div class="row">
+<span>Mining Time</span>
+<b id="time">0 min</b>
+</div>
+
+<button class="action" onclick="toggleMining()" id="mineButton">
+START MINING
+</button>
+
+</div>
+
+</div>
+
+
+<!-- FRIENDS -->
+
+<div id="friends" class="page">
+
+<div class="card">
+
+<h2>👥 Friends</h2>
+
+<div class="row">
+<span>Referral Code</span>
+<b>RNGP-NIROB</b>
+</div>
+
+<div class="row">
+<span>Total Friends</span>
+<b id="friendsCount">0</b>
+</div>
+
+<button class="action" onclick="copyReferral()">
+COPY REFERRAL
+</button>
+
+</div>
+
+</div>
+
+
+<!-- PROFILE -->
+
+<div id="profile" class="page">
+
+<div class="card">
+
+<h2>👤 Profile</h2>
+
+<div class="row">
+<span>Name</span>
+<b id="profileName">NIROB</b>
+</div>
+
+<div class="row">
+<span>Telegram ID</span>
+<b id="telegramId">Demo</b>
+</div>
+
+<div class="row">
+<span>Level</span>
+<b id="profileLevel">1</b>
+</div>
+
+</div>
+
+
+<!-- DEMO ADMIN -->
+
+<div class="card">
+
+<h2>⚙️ Admin Settings</h2>
+
+<p class="small">
+এগুলো এখন Demo Settings। পরে আলাদা secure Admin Panel দিয়ে পুরো App control করা যাবে।
+</p>
+
+<label>Name</label>
+
+<input id="adminName" value="NIROB">
+
+<label>Mining Rate</label>
+
+<input id="adminRate" type="number" value="1">
+
+<label>Pool Balance</label>
+
+<input id="adminPool" type="number" value="0">
+
+<button class="save" onclick="saveSettings()">
+SAVE SETTINGS
+</button>
+
+</div>
+
+</div>
+
+
+<!-- BOTTOM NAV -->
+
+<div class="bottom">
+
+<button class="active" onclick="openPage('home',this)">
+<span class="icon">⌂</span>
+Mine
+</button>
+
+<button onclick="openPage('tasks',this)">
+<span class="icon">▣</span>
+Tasks
+</button>
+
+<button onclick="openPage('miners',this)">
+<span class="icon">⚡</span>
+Miners
+</button>
+
+<button onclick="openPage('friends',this)">
+<span class="icon">♟</span>
+Friends
+</button>
+
+<button onclick="openPage('profile',this)">
+<span class="icon">●</span>
+Profile
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+let balance=0;
+let holding=0;
+let pool=0;
+let gain=0;
+let mining=false;
+let miningTime=0;
+let miningRate=1;
+
+const tg=window.Telegram?.WebApp;
+
+if(tg){
+
+tg.ready();
+tg.expand();
+
+if(tg.initDataUnsafe?.user){
+
+let user=tg.initDataUnsafe.user;
+
+document.getElementById("username").innerText =
+user.first_name || "NIROB";
+
+document.getElementById("profileName").innerText =
+user.first_name || "NIROB";
+
+document.getElementById("telegramId").innerText =
+user.id;
+
+}
+
+}
+
+
+/* PAGE */
+
+function openPage(id,button){
+
+document.querySelectorAll(".page").forEach(page=>{
+page.classList.remove("active");
+});
+
+document.getElementById(id).classList.add("active");
+
+document.querySelectorAll(".bottom button").forEach(btn=>{
+btn.classList.remove("active");
+});
+
+button.classList.add("active");
+
+}
+
+
+/* MINING */
+
+function toggleMining(){
+
+mining=!mining;
+
+if(mining){
+
+document.getElementById("status").innerText="MINING";
+
+document.getElementById("minerStatus").innerText="Mining";
+
+document.getElementById("mineButton").innerText="STOP MINING";
+
+}else{
+
+document.getElementById("status").innerText="READY";
+
+document.getElementById("minerStatus").innerText="Ready";
+
+document.getElementById("mineButton").innerText="START MINING";
+
+}
+
+}
+
+
+/* EVERY MINUTE */
+
+setInterval(()=>{
+
+if(!mining)return;
+
+gain += miningRate;
+
+miningTime++;
+
+document.getElementById("gain").innerText =
+gain.toFixed(4);
+
+document.getElementById("time").innerText =
+miningTime+" min";
+
+},60000);
+
+
+/* CLAIM */
+
+function claim(){
+
+if(gain<=0){
+
+alert("Nothing to claim yet.");
+
+return;
+
+}
+
+holding += gain;
+
+balance = holding + pool;
+
+gain=0;
+
+document.getElementById("holding").innerText =
+holding.toFixed(4);
+
+document.getElementById("balance").innerText =
+balance.toFixed(4);
+
+document.getElementById("gain").innerText =
+"0.0000";
+
+}
+
+
+/* TASK REWARD */
+
+function taskReward(button,reward){
+
+if(button.disabled)return;
+
+holding += reward;
+
+balance = holding + pool;
+
+button.innerText="DONE";
+
+button.disabled=true;
+
+document.getElementById("holding").innerText =
+holding.toFixed(4);
+
+document.getElementById("balance").innerText =
+balance.toFixed(4);
+
+}
+
+
+/* WALLET */
+
+function wallet(){
+
+alert(
+"Wallet connection is not enabled in this demo."
+);
+
+}
+
+
+/* REFERRAL */
+
+function copyReferral(){
+
+alert("Referral code: RNGP-NIROB");
+
+}
+
+
+/* ADMIN SETTINGS */
+
+function saveSettings(){
+
+let name =
+document.getElementById("adminName").value || "NIROB";
+
+let rate =
+Number(document.getElementById("adminRate").value) || 1;
+
+let newPool =
+Number(document.getElementById("adminPool").value) || 0;
+
+miningRate=rate;
+pool=newPool;
+
+document.getElementById("username").innerText=name;
+document.getElementById("profileName").innerText=name;
+
+document.getElementById("rate").innerText =
+rate+" RNGP/min";
+
+document.getElementById("pool").innerText =
+pool.toFixed(4);
+
+document.getElementById("balance").innerText =
+(holding+pool).toFixed(4);
+
+alert("Settings saved!");
+
+}
+
+</script>
+
+</body>
+</html>
